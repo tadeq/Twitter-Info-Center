@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Component
 public class StreamingClient {
 
@@ -23,36 +26,8 @@ public class StreamingClient {
                 .setOAuthAccessToken(provider.getAccessToken())
                 .setOAuthAccessTokenSecret(provider.getAccessTokenSecret());
         TwitterStream twitterStream = new TwitterStreamFactory(configurationBuilder.build()).getInstance();
-        twitterStream.addListener(new StatusListener() {
-            @Override
-            public void onException(Exception ex) {
-
-            }
-
-            @Override
-            public void onStatus(Status status) {
-                System.out.println(status.getText());
-            }
-
-            @Override
-            public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-
-            }
-
-            @Override
-            public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
-
-            }
-
-            @Override
-            public void onScrubGeo(long userId, long upToStatusId) {
-
-            }
-
-            @Override
-            public void onStallWarning(StallWarning warning) {
-
-            }
+        twitterStream.onStatus(status -> {
+            System.out.println(status);
         });
         twitterStream.filter(new FilterQuery(2899773086L));
     }

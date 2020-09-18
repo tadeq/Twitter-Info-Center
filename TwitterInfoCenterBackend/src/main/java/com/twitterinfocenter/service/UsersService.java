@@ -3,7 +3,7 @@ package com.twitterinfocenter.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.twitterinfocenter.client.TwitterApiClient;
+import com.twitterinfocenter.client.TwitterClient;
 import com.twitterinfocenter.exception.TwitterInfoCenterException;
 import com.twitterinfocenter.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +23,15 @@ public class UsersService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private TwitterApiClient twitterApiClient;
+    private TwitterClient twitterClient;
 
     @Autowired
-    public UsersService(TwitterApiClient twitterApiClient) {
-        this.twitterApiClient = twitterApiClient;
+    public UsersService(TwitterClient twitterClient) {
+        this.twitterClient = twitterClient;
     }
 
     public List<User> getUsersByUsernames(List<String> usernames) {
-        HttpResponse<String> response = twitterApiClient.getUsersByUsernames(usernames);
+        HttpResponse<String> response = twitterClient.getUsersByUsernames(usernames);
         try {
             JsonNode jsonTree = OBJECT_MAPPER.readTree(response.body());
             if (HttpStatus.valueOf(response.statusCode()).isError()) {

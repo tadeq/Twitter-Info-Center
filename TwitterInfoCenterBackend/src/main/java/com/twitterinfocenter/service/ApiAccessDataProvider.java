@@ -1,11 +1,9 @@
 package com.twitterinfocenter.service;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-@Getter
 @Component
 @PropertySource("classpath:access.properties")
 public class ApiAccessDataProvider {
@@ -25,23 +23,23 @@ public class ApiAccessDataProvider {
     @Value("${access.token.secret}")
     private String accessTokenSecret;
 
-//    public String getBearerToken() {
-//        return bearerToken;
-//    }
-//
-//    public String getApiKey() {
-//        return apiKey;
-//    }
-//
-//    public String getApiKeySecret() {
-//        return apiKeySecret;
-//    }
-//
-//    public String getAccessToken() {
-//        return accessToken;
-//    }
-//
-//    public String getAccessTokenSecret() {
-//        return accessTokenSecret;
-//    }
+    public String getBearerToken() {
+        return bearerToken;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public String getApiKeySecret() {
+        return apiKeySecret;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getAccessTokenSecret() {
+        return accessTokenSecret;
+    }
 }
