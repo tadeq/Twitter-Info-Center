@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UsersService {
@@ -23,7 +24,9 @@ public class UsersService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private TwitterClient twitterClient;
+    private final TwitterClient twitterClient;
+
+    private List<User> users = new ArrayList<>();
 
     @Autowired
     public UsersService(TwitterClient twitterClient) {
@@ -31,18 +34,36 @@ public class UsersService {
     }
 
     public List<User> getUsersByUsernames(List<String> usernames) {
+        return users.stream()
+                .filter(user -> usernames.contains(user.getName()))
+                .collect(Collectors.toList());
+    }
+
+    public List<User> addUsers(List<String> usernames) {
         HttpResponse<String> response = twitterClient.getUsersByUsernames(usernames);
         try {
             JsonNode jsonTree = OBJECT_MAPPER.readTree(response.body());
-            if (HttpStatus.valueOf(response.statusCode()).isError()) {
-                throw new TwitterInfoCenterException(response.statusCode(), buildErrorMessage(jsonTree));
-            }
+            checkResponseCode(response, jsonTree);
             String dataResponseNode = jsonTree.get(DATA_NODE).toString();
-            return OBJECT_MAPPER.readValue(dataResponseNode, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, User.class));
+            List<User> users = OBJECT_MAPPER.readValue(dataResponseNode, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, User.class));
+            this.users.addAll(users);
+            return users;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-            throw new TwitterInfoCenterException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "Problem when processing response " + e.getMessage());
+            throw new TwitterInfoCenterException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Problem when processing response: " + e.getMessage());
+        }
+    }
+
+    public void deleteUsers(List<String> usernames) {
+        //TODO add unsubscribing users from twitter
+        this.users = this.users.stream()
+                .filter(user -> !usernames.contains(user.getName()))
+                .collect(Collectors.toList());
+    }
+
+    private void checkResponseCode (HttpResponse<String> response, JsonNode jsonTree) {
+        if (HttpStatus.valueOf(response.statusCode()).isError()) {
+            throw new TwitterInfoCenterException(response.statusCode(), buildErrorMessage(jsonTree));
         }
     }
 
@@ -53,5 +74,10 @@ public class UsersService {
             messages.add(errorNode.get(MESSAGE_NODE).toPrettyString());
         }
         return String.join(";\n", messages);
+    }
+
+    private void handleJsonProcessingException(Exception e) {
+        e.printStackTrace();
+        throw new TwitterInfoCenterException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Problem when processing response: " + e.getMessage());
     }
 }

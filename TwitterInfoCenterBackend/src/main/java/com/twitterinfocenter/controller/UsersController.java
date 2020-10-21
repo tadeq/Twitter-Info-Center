@@ -1,6 +1,5 @@
 package com.twitterinfocenter.controller;
 
-import com.twitterinfocenter.client.StreamingClient;
 import com.twitterinfocenter.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,37 +8,30 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class SubscriptionsController {
+@RequestMapping("users")
+public class UsersController {
 
-    private final StreamingClient streamingClient;
 
     private final UsersService usersService;
 
     @Autowired
-    public SubscriptionsController(StreamingClient streamingClient, UsersService usersService) {
-        this.streamingClient = streamingClient;
+    public UsersController(UsersService usersService) {
         this.usersService = usersService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> get() {
-        System.out.println("START STREAMING");
-        streamingClient.testStreaming();
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/users")
+    @GetMapping
     public ResponseEntity<?> getUsers(@RequestParam List<String> usernames) {
         return ResponseEntity.ok(usersService.getUsersByUsernames(usernames));
     }
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<?> addSubscribedUsers(@RequestParam List<String> usernames) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(usersService.addUsers(usernames));
     }
 
-    @DeleteMapping("/users")
+    @DeleteMapping
     public ResponseEntity<?> deleteSubscribedUsers(@RequestParam List<String> usernames) {
-        return ResponseEntity.ok().build();
+        usersService.deleteUsers(usernames);
+        return ResponseEntity.noContent().build();
     }
 }

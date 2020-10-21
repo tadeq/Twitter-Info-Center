@@ -3,22 +3,21 @@ package com.twitterinfocenter.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
-@Value
-public class User {
-    @JsonProperty("id")
-    long id;
+import java.util.List;
 
+@Value
+public class Category {
     @JsonProperty("name")
     String name;
 
-    @JsonProperty("username")
-    String username;
+    @JsonProperty("usernames")
+    List<String> usernames;
 
     public String getName() {
         return name;
     }
 
-    public String getUsername() {
-        return username;
+    public List<String> getUsernames() {
+        return usernames;
     }
 }
